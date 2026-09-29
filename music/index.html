@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music — Certified Online</title>
+<meta name="description" content="Certified Online / Music — music, releases &amp; platforms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ---- same tokens as the main Certified Online page ---- */
+  :root{
+    --cream:#ffffff;
+    --red:#c1272d;
+    --red-deep:#8f1a1e;
+    --ink:#2a1f16;
+    --ink-soft:#5b4a3c;
+    --line: rgba(193,39,45,0.35);
+    --green:#3fae5a;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--cream); color:var(--ink);
+    font-family:'Space Mono', monospace; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit; text-decoration:none;}
+  p{ line-height:1.75; color:var(--ink-soft); font-size:1.02rem; }
+
+  /* same subtle digital grid used on the entrance page */
+  .music-page{ position:relative; }
+  .music-page::before{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      linear-gradient(rgba(193,39,45,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(193,39,45,0.035) 1px, transparent 1px),
+      radial-gradient(rgba(193,39,45,0.05) 1px, transparent 1.4px);
+    background-size: 34px 34px, 34px 34px, 12px 12px;
+  }
+  .music-page > *{ position:relative; z-index:1; }
+
+  /* ---- nav: identical to the main page ---- */
+  header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:center;
+    padding: 16px 5vw; background:var(--cream); border-bottom: 2px solid var(--red);
+  }
+  nav{display:flex; align-items:center; gap:clamp(18px,3vw,40px);}
+  nav a{
+    font-family:'Pixelify Sans', sans-serif; font-size:0.9rem; letter-spacing:1.5px;
+    color:var(--red); text-transform:uppercase; padding:4px 2px;
+  }
+  nav a.contact-btn{ border:2px solid var(--red); border-radius:6px; padding:7px 16px; }
+  nav a[aria-current="page"]{ border-bottom:2px solid var(--red); }
+
+  .wrap{ max-width:920px; margin:0 auto; padding:0 6vw; }
+  .eyebrow{
+    font-family:'Pixelify Sans', sans-serif; color:var(--red); letter-spacing:3px;
+    font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;
+  }
+  .section-title{
+    font-family:'Pixelify Sans', sans-serif; font-size:clamp(1.3rem,3vw,1.7rem); color:var(--ink);
+    margin:0 0 20px; border-bottom:2px solid var(--line); padding-bottom:12px; text-transform:uppercase; letter-spacing:1px;
+  }
+  .block{ padding: 0 0 clamp(56px,9vh,88px); }
+
+  /* ---- 1. header ---- */
+  .music-head{ padding: clamp(56px,11vh,110px) 0 clamp(36px,6vh,56px); }
+  .music-head h1{
+    font-family:'Pixelify Sans', sans-serif; font-size:clamp(2rem,5.2vw,3.2rem); color:var(--ink);
+    margin:0; line-height:1.1; text-transform:uppercase; letter-spacing:1px;
+  }
+  .music-head h1 .slash{ color:var(--red); }
+  .music-head p{ margin:14px 0 0; }
+
+  /* ---- hover preview (SoundCloud) ---- */
+  .platform-row.has-preview{ position:relative; overflow:hidden; }
+  .preview-bar{
+    position:absolute; left:0; bottom:0; height:3px; width:100%; background:var(--red);
+    transform-origin:left center; transform:scaleX(0); pointer-events:none;
+  }
+  .platform-row.is-previewing .preview-bar{ transform:scaleX(var(--p,0)); }
+  .preview-eq{ display:none; align-items:flex-end; gap:2px; height:11px; margin-left:4px; }
+  .preview-eq i{ width:3px; background:var(--red); animation:eq .8s ease-in-out infinite; }
+  .preview-eq i:nth-child(2){ animation-delay:.2s; } .preview-eq i:nth-child(3){ animation-delay:.4s; }
+  .platform-row.is-previewing .preview-eq{ display:inline-flex; }
+  @keyframes eq{ 0%,100%{ height:3px; } 50%{ height:11px; } }
+  .preview-btn{
+    display:none; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:12px 18px;
+    font-family:'Pixelify Sans', sans-serif; font-size:0.85rem; letter-spacing:1px; text-transform:uppercase;
+    color:var(--red); background:var(--cream); border:2px dashed var(--red); border-radius:8px; cursor:pointer;
+  }
+  @media (hover:none){ .preview-btn{ display:inline-flex; } }
+  .sc-frame{ position:absolute; width:1px; height:1px; left:-9999px; top:0; border:0; opacity:0; pointer-events:none; }
+
+  /* ---- buttons: same language as Services / Archive buttons ---- */
+  .co-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    font-family:'Pixelify Sans', sans-serif; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase;
+    color:var(--red); background:var(--cream); border:2px solid var(--red); border-radius:8px;
+    padding:12px 22px; min-height:46px; white-space:nowrap;
+    transition: background .18s ease, color .18s ease, transform .18s ease;
+  }
+  .co-btn:hover{ background:var(--red); color:var(--cream); transform:translateY(-2px); }
+  .co-btn.solid{ background:var(--red); color:var(--cream); }
+  .co-btn.solid:hover{ background:var(--red-deep); border-color:var(--red-deep); }
+  .co-btn:focus-visible, .social-btn:focus-visible{ outline:2px solid var(--red-deep); outline-offset:3px; }
+  .inactive-label{
+    display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:12px 18px;
+    font-family:'Pixelify Sans', sans-serif; font-size:0.8rem; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--ink-soft); border:2px dashed var(--line); border-radius:8px; white-space:nowrap; cursor:default; user-select:none;
+  }
+
+  /* ---- 3. streaming platforms (ticket rows, like Services) ---- */
+  .platforms{ display:flex; flex-direction:column; gap:12px; }
+  .platform-row{
+    display:flex; align-items:center; gap:18px; background:var(--cream);
+    border:2px solid var(--red); border-left:8px solid var(--red); border-radius:10px; padding:16px 20px;
+  }
+  .platform-row.is-soon{ border-color:var(--line); border-left-color:var(--line); border-style:dashed; border-left-style:solid; }
+  .platform-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; }
+  .platform-name{ font-family:'Pixelify Sans', sans-serif; font-size:1.15rem; color:var(--red-deep); text-transform:uppercase; letter-spacing:1px; }
+  .platform-row.is-soon .platform-name{ color:var(--ink-soft); }
+  .platform-status{
+    display:inline-flex; align-items:center; gap:8px; font-family:'Pixelify Sans', sans-serif; font-size:0.74rem;
+    text-transform:uppercase; letter-spacing:1px; color:var(--ink-soft);
+  }
+  .status-dot{ width:9px; height:9px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; flex-shrink:0; }
+  .status-dot.off{ background:transparent; border:1.5px solid var(--line); animation:none; }
+  @keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(63,174,90,0.45);} 70%{box-shadow:0 0 0 8px rgba(63,174,90,0);} 100%{box-shadow:0 0 0 0 rgba(63,174,90,0);} }
+
+  /* ---- 5. follow / connect (Archive link-btn style) ---- */
+  .social-row{ display:flex; flex-wrap:wrap; gap:10px; }
+  .social-btn{
+    flex:1 1 180px; display:flex; align-items:center; gap:10px; min-height:48px;
+    border:2px solid var(--red); border-radius:10px; padding:11px 15px;
+    font-family:'Pixelify Sans', sans-serif; font-size:0.89rem; letter-spacing:0.5px; color:var(--red-deep); text-transform:uppercase;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+  }
+  a.social-btn:hover{ background:var(--red); color:var(--cream); transform:translateY(-2px); }
+  .social-btn .label{ flex:1; }
+  .social-btn svg{ flex-shrink:0; }
+  .social-btn.is-soon{ border-style:dashed; border-color:var(--line); color:var(--ink-soft); cursor:default; }
+  .social-btn.is-soon .arrow{ font-size:0.65rem; letter-spacing:1.5px; }
+
+  /* ---- 6. return ---- */
+  .return{ border-top:2px solid var(--red); padding:36px 6vw 10px; text-align:center; }
+  .return .return-brand{ font-family:'Pixelify Sans', sans-serif; color:var(--red); letter-spacing:3px; font-size:0.85rem; text-transform:uppercase; }
+  .return-links{ display:flex; flex-wrap:wrap; justify-content:center; gap:10px 26px; margin-top:14px; }
+  .return-links a{
+    font-family:'Pixelify Sans', sans-serif; font-size:0.8rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-soft);
+    padding:8px 2px; border-bottom:1px solid transparent; transition: color .15s ease, border-color .15s ease;
+  }
+  .return-links a:hover{ color:var(--red); border-color:var(--red); }
+  footer{
+    text-align:center; padding: 20px 6vw 40px; font-size:0.75rem; color:var(--ink-soft);
+    letter-spacing:1px; font-family:'Pixelify Sans', sans-serif; text-transform:uppercase;
+  }
+
+  .footer-ig{ color:var(--red); border-bottom:1px solid transparent; transition:border-color .15s ease; }
+  .footer-ig:hover{ border-color:var(--red); }
+  .footer-sep{ margin:0 6px; opacity:0.5; }
+
+  /* ---- subtle reveal ---- */
+  .reveal{ opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+
+  /* ---- responsive ---- */
+  @media (max-width:640px){
+    header{ padding:14px 5vw; }
+    nav{ gap:12px; }
+    nav a{ font-size:0.7rem; }
+    .platform-row{ flex-wrap:wrap; padding:14px 16px; gap:12px; }
+    .platform-row .co-btn, .platform-row .preview-btn{ width:100%; }
+    .platform-row.is-soon .inactive-label{ display:none; }
+    .return-links{ gap:8px 18px; }
+    .social-btn{ flex-basis:100%; }
+  }
+  @media (max-width:400px){
+    header{ padding:14px 3vw; }
+    nav{ gap:8px; }
+    nav a{ font-size:0.62rem; letter-spacing:1px; }
+    nav a.contact-btn{ padding:6px 8px; }
+  }
+  /* six links (About added) */
+  @media (max-width:480px){
+    nav{ gap:clamp(5px,1.8vw,10px); }
+    nav a{ font-size:clamp(0.52rem,2.6vw,0.66rem); letter-spacing:0.5px; padding:4px 0; }
+    nav a.contact-btn{ padding:5px 6px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+    html{ scroll-behavior:auto; }
+    .reveal{ opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<!--
+  ================================================================
+  MUSIC SETTINGS — edit this block to update the page.
+  ----------------------------------------------------------------
+  • A platform becomes clickable when  status: "available"  AND  url  is filled in.
+    Example — turning Spotify on:
+      { name: "Spotify", status: "available", url: "https://open.spotify.com/artist/...", button: "Listen" },
+  • Leave url: "" for anything not live yet. It will show as COMING SOON (not clickable).
+  ================================================================
+-->
+<script>
+window.MUSIC_CONFIG = {
+  platforms: [
+    { name: "SoundCloud",    status: "available",   url: "https://soundcloud.com/milliondollababyy", button: "Listen",
+      // hover preview: plays this link for `seconds` when the row is hovered (tap "Preview" on phones).
+      // Paste a specific track link here to preview that song; the profile link plays the newest upload.
+      // audio: a clip file on your own site (e.g. "/music/preview.mp3"). When filled in it is used instead of the SoundCloud player.
+      preview: { url: "https://soundcloud.com/milliondollababyy", audio: "", start: 0, seconds: 15 } },
+    { name: "Spotify",       status: "coming-soon", url: "", button: "Coming Soon" },
+    { name: "Apple Music",   status: "coming-soon", url: "", button: "Coming Soon" },
+    { name: "YouTube",       status: "available",   url: "https://www.youtube.com/@Onlymdb", button: "Listen" }
+  ],
+
+  social: [
+    { name: "Instagram",  icon: "instagram",  url: "https://www.instagram.com/certifiedonline.us" },
+    { name: "SoundCloud", icon: "soundcloud", url: "https://soundcloud.com/milliondollababyy" },
+    { name: "YouTube",    icon: "youtube",    url: "https://www.youtube.com/@Onlymdb" }
+  ]
+};
+</script>
+
+<header>
+  <nav aria-label="Primary">
+    <a href="/">Home</a>
+    <a href="/#about">About</a>
+    <a href="/#services">Services</a>
+    <a href="/#archive">Archive</a>
+    <a href="/music/" aria-current="page">Music</a>
+    <a href="/#contact" class="contact-btn">Contact</a>
+  </nav>
+</header>
+
+<main class="music-page">
+  <div class="wrap">
+
+    <!-- 1. MUSIC HEADER -->
+    <section class="music-head reveal">
+      <div class="eyebrow">// Music</div>
+      <h1>Certified Online <span class="slash">/</span> Music</h1>
+      <p>Music, releases &amp; platforms.</p>
+    </section>
+
+    <!-- 3. STREAMING PLATFORMS -->
+    <section class="block reveal" aria-labelledby="platformsTitle">
+      <h2 class="section-title" id="platformsTitle">Streaming Platforms</h2>
+      <div class="platforms" id="platformList"></div>
+    </section>
+
+    <!-- 5. FOLLOW / CONNECT -->
+    <section class="block reveal" aria-labelledby="socialTitle">
+      <h2 class="section-title" id="socialTitle">Follow / Connect</h2>
+      <div class="social-row" id="socialRow"></div>
+    </section>
+
+  </div>
+
+  <!-- 6. RETURN -->
+  <div class="return" role="navigation" aria-label="Certified Online">
+    <div class="return-brand">Certified Online</div>
+    <div class="return-links">
+      <a href="/">Home</a>
+      <a href="/#about">About</a>
+      <a href="/#services">Services</a>
+      <a href="/#archive">Archive</a>
+      <a href="/#contact">Contact</a>
+    </div>
+  </div>
+</main>
+
+<footer>Certified Online — MDB <span class="footer-sep">/</span> <a class="footer-ig" href="https://www.instagram.com/certifiedonline.us" target="_blank" rel="noopener">Instagram @certifiedonline.us</a></footer>
+
+<script>
+(function(){
+  var C = window.MUSIC_CONFIG || {};
+  var ICONS = {
+    soundcloud: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M1.5 15.5c-.3 0-.5-.2-.5-.5v-3c0-.3.2-.5.5-.5s.5.2.5.5v3c0 .3-.2.5-.5.5zm2 1c-.3 0-.5-.2-.5-.5v-5c0-.3.2-.5.5-.5s.5.2.5.5v5c0 .3-.2.5-.5.5zm2 .3c-.3 0-.5-.2-.5-.5V9.7c0-.3.2-.5.5-.5s.5.2.5.5v6.6c0 .3-.2.5-.5.5zm2 .2c-.3 0-.5-.2-.5-.5V8.2c0-.3.2-.5.5-.5s.5.2.5.5V17c0 .3-.2.5-.5.5zm2.2 0h-.1c-.3 0-.5-.2-.5-.5V6.6c0-.3.2-.5.5-.6.3 0 .5.2.5.5v10.5c0 .3-.2.5-.4.5zM19 8.3c-.3 0-.6 0-.9.1-.4-2.5-2.6-4.4-5.2-4.4-.6 0-1.3.1-1.9.4-.2.1-.3.2-.3.4v12.5c0 .2.2.4.4.4H19c2.2 0 4-1.8 4-4s-1.8-3.9-4-4.4z"/></svg>',
+    instagram:  '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M12 2.2c2.7 0 3 0 4 .1 1 0 1.7.2 2.1.4.5.2.9.5 1.3.9.4.4.6.7.9 1.3.2.4.3 1 .4 2.1.1 1 .1 1.3.1 4s0 3-.1 4c0 1-.2 1.7-.4 2.1-.2.5-.5.9-.9 1.3-.4.4-.7.6-1.3.9-.4.2-1 .3-2.1.4-1 .1-1.3.1-4 .1s-3 0-4-.1c-1 0-1.7-.2-2.1-.4-.5-.2-.9-.5-1.3-.9-.4-.4-.6-.7-.9-1.3-.2-.4-.3-1-.4-2.1-.1-1-.1-1.3-.1-4s0-3 .1-4c0-1 .2-1.7.4-2.1.2-.5.5-.9.9-1.3.4-.4.7-.6 1.3-.9.4-.2 1-.3 2.1-.4 1-.1 1.3-.1 4-.1zM12 0C9.3 0 8.9 0 7.9.1c-1 .1-1.8.2-2.4.5-.7.3-1.3.6-1.8 1.2C3.1 2.3 2.8 2.9 2.5 3.6c-.3.6-.4 1.4-.5 2.4C2 7 2 7.3 2 10s0 3 .1 4c.1 1 .2 1.8.5 2.4.3.7.6 1.3 1.2 1.8.5.5 1.1.9 1.8 1.2.6.3 1.4.4 2.4.5C8.9 20 9.3 20 12 20s3.1 0 4.1-.1c1-.1 1.8-.2 2.4-.5.7-.3 1.3-.6 1.8-1.2.5-.5.9-1.1 1.2-1.8.3-.6.4-1.4.5-2.4.1-1 .1-1.3.1-4s0-3-.1-4c-.1-1-.2-1.8-.5-2.4-.3-.7-.6-1.3-1.2-1.8-.5-.5-1.1-.9-1.8-1.2-.6-.3-1.4-.4-2.4-.5C15.1 0 14.7 0 12 0z"/><path d="M12 4.9A5.1 5.1 0 1 0 12 15a5.1 5.1 0 0 0 0-10.2zm0 8.4a3.3 3.3 0 1 1 0-6.6 3.3 3.3 0 0 1 0 6.6zM17.3 4.7a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"/></svg>',
+    youtube:    '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>'
+  };
+  function el(tag, cls, text){ var e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+  function isLive(item){ return !!(item && item.url && String(item.url).trim()) && (item.status===undefined || item.status==='available'); }
+  function linkOut(a, url){ a.href=url; a.target='_blank'; a.rel='noopener'; }
+
+  // platforms
+  var pl = document.getElementById('platformList');
+  (C.platforms||[]).forEach(function(p){
+    var live = isLive(p);
+    var row = el('div','platform-row' + (live ? '' : ' is-soon'));
+    var body = el('div','platform-body');
+    body.appendChild(el('div','platform-name',p.name));
+    var st = el('div','platform-status');
+    st.appendChild(el('span','status-dot' + (live ? '' : ' off')));
+    st.appendChild(document.createTextNode(live ? 'Available now' : 'Coming soon'));
+    body.appendChild(st);
+    row.appendChild(body);
+    if (live){ var a=el('a','co-btn',(p.button||'Listen')+' \u2192'); linkOut(a,p.url); a.setAttribute('aria-label',(p.button||'Listen')+' on '+p.name); row.appendChild(a); }
+    else { var s=el('span','inactive-label','Coming Soon'); s.setAttribute('aria-disabled','true'); row.appendChild(s); }
+    pl.appendChild(row);
+    if (live && p.preview && p.preview.url) setupPreview(row, st, p.preview);
+  });
+
+  // ---- SoundCloud hover preview ----
+  function setupPreview(row, statusEl, cfg){
+    var seconds = cfg.seconds || 15, startMs = (cfg.start || 0) * 1000;
+    row.classList.add('has-preview');
+    var bar = el('span','preview-bar'); row.appendChild(bar);
+    var eq = el('span','preview-eq'); eq.innerHTML='<i></i><i></i><i></i>'; statusEl.appendChild(eq);
+    var statusText = statusEl.childNodes[1];
+    var btn = el('button','preview-btn','\u25B6 Preview'); btn.type='button';
+    row.insertBefore(btn, row.querySelector('.co-btn'));
+
+    var widget=null, ready=false, loading=false, playing=false, wanted=false, timer=null, raf=null, t0=0, fadeTimer=null;
+
+    function load(cb){
+      if (ready) return cb && cb();
+      if (loading){ pending = cb; return; }
+      loading = true; pending = cb;
+      if (cfg.audio){ return loadAudio(); }
+      var s = document.createElement('script'); s.src='https://w.soundcloud.com/player/api.js';
+      s.onload = function(){
+        var f = document.createElement('iframe');
+        f.className='sc-frame'; f.title='SoundCloud preview'; f.allow='autoplay'; f.setAttribute('aria-hidden','true'); f.tabIndex=-1;
+        f.src='https://w.soundcloud.com/player/?url='+encodeURIComponent(cfg.url)+'&auto_play=false&buying=false&sharing=false&download=false&show_artwork=false&visual=false';
+        document.body.appendChild(f);
+        widget = SC.Widget(f);
+        widget.bind(SC.Widget.Events.READY, function(){
+          ready = true;
+          widget.bind(SC.Widget.Events.PLAY, function(){ if(!wanted){ widget.pause(); return; } onStarted(); });
+          widget.bind(SC.Widget.Events.FINISH, stop);
+          if (pending){ var c=pending; pending=null; c(); }
+        });
+      };
+      document.head.appendChild(s);
+    }
+    var pending=null;
+
+    // audio-file preview: a clip hosted on the site itself (works anywhere, no SoundCloud player needed)
+    function loadAudio(){
+      var a = new Audio(); a.preload='auto'; a.src = cfg.audio;
+      var handlers = {};
+      widget = {
+        bind: function(ev, fn){ handlers[ev]=fn; },
+        play: function(){
+          var pr = a.play();
+          if (pr && pr.catch) pr.catch(function(){ if (wanted) statusText.nodeValue = 'Click anywhere, then hover to preview'; });
+        },
+        pause: function(){ a.pause(); },
+        seekTo: function(ms){ try{ a.currentTime = ms/1000; }catch(e){} },
+        setVolume: function(v){ a.volume = Math.max(0, Math.min(1, v/100)); },
+        getVolume: function(cb){ cb(a.volume*100); }
+      };
+      a.addEventListener('playing', function(){ if(!wanted){ a.pause(); return; } onStarted(); });
+      a.addEventListener('ended', stop);
+      ready = true;
+      if (pending){ var c=pending; pending=null; c(); }
+    }
+
+    // browsers only allow sound after the visitor has clicked/tapped the page once;
+    // if they are already hovering when that first click happens, start the preview right away
+    ['pointerdown','keydown'].forEach(function(t){
+      document.addEventListener(t, function(){ if (wanted && !playing && ready){ widget.seekTo(startMs); widget.play(); } }, { once:true, capture:true });
+    });
+
+    function fadeTo(target, ms, done){
+      clearInterval(fadeTimer);
+      widget.getVolume(function(v){
+        var steps = 10, i = 0, from = (typeof v==='number') ? v : 0;
+        fadeTimer = setInterval(function(){
+          i++; widget.setVolume(from + (target-from)*i/steps);
+          if (i>=steps){ clearInterval(fadeTimer); done && done(); }
+        }, ms/steps);
+      });
+    }
+    function start(){
+      wanted = true;
+      load(function(){
+        if (!wanted) return;
+        widget.setVolume(0);
+        // SoundCloud profile link: always start from the first song on the profile
+        if (!cfg.audio && widget.skip){ widget.skip(0); }
+        widget.seekTo(startMs); widget.play();
+        // if the browser blocked audio (no click on the page yet), let the visitor know
+        setTimeout(function(){ if (wanted && !playing) statusText.nodeValue = 'Click anywhere, then hover to preview'; }, 1500);
+      });
+    }
+    function onStarted(){
+      if (playing) return;
+      playing = true; row.classList.add('is-previewing'); statusText.nodeValue = 'Previewing';
+      btn.textContent = '\u25A0 Stop';
+      fadeTo(80, 500);
+      t0 = performance.now();
+      (function tick(){
+        var p = Math.min(1,(performance.now()-t0)/(seconds*1000));
+        row.style.setProperty('--p', p);
+        if (p < 1 && playing) raf = requestAnimationFrame(tick);
+      })();
+      clearTimeout(timer); timer = setTimeout(stop, seconds*1000);
+    }
+    function stop(){
+      wanted = false; clearTimeout(timer); cancelAnimationFrame(raf);
+      row.classList.remove('is-previewing'); row.style.setProperty('--p',0);
+      statusText.nodeValue = 'Available now'; btn.textContent = '\u25B6 Preview';
+      if (widget && playing){ fadeTo(0, 400, function(){ widget.pause(); }); }
+      playing = false;
+    }
+
+    var canHover = window.matchMedia && window.matchMedia('(hover:hover)').matches;
+    if (canHover){
+      row.addEventListener('mouseenter', start);
+      row.addEventListener('mouseleave', stop);
+      // warm up the player shortly after the page loads so the first hover starts quickly
+      setTimeout(function(){ load(); }, 1200);
+    }
+    btn.addEventListener('click', function(){ (playing || wanted) ? stop() : start(); });
+    document.addEventListener('visibilitychange', function(){ if (document.hidden) stop(); });
+  }
+
+  // social
+  var sr = document.getElementById('socialRow');
+  (C.social||[]).forEach(function(s){
+    var live = isLive(s);
+    var b = el(live ? 'a' : 'div','social-btn' + (live ? '' : ' is-soon'));
+    if (ICONS[s.icon]){ var w=el('span'); w.innerHTML=ICONS[s.icon]; b.appendChild(w.firstChild); }
+    b.appendChild(el('span','label',s.name));
+    b.appendChild(el('span','arrow', live ? '\u2192' : 'Soon'));
+    if (live) linkOut(b,s.url);
+    sr.appendChild(b);
+  });
+
+  // subtle reveal on scroll
+  var items = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)){ items.forEach(function(i){ i.classList.add('in'); }); return; }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{ threshold:0.12 });
+  items.forEach(function(i){ io.observe(i); });
+})();
+</script>
+</body>
+</html>
