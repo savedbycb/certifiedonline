@@ -333,7 +333,7 @@ input[type=range]{accent-color:var(--red)}
   <img class="boot-logo" data-logo alt="Certified Online">
   <div class="tag">Fanatic dreams, the faster it seems</div>
   <div class="bootbar"><i></i><i></i><i></i></div>
-  <small>Starting Certified Online 98… (click to skip)</small>
+  <small>Starting Certified Online… (click to skip)</small>
 </div>
 <div id="shutdown" role="button" aria-label="Restart">
   <img class="boot-logo" data-logo alt="" style="width:min(160px,40vw)">
@@ -627,7 +627,7 @@ const CONFIG = {
   LOGO_URL: "",
 
   // Your Dropbox FILE REQUEST link (Dropbox → File requests → New request → copy link).
-  DROPBOX_REQUEST_URL: "PASTE_YOUR_DROPBOX_FILE_REQUEST_LINK_HERE",
+  DROPBOX_REQUEST_URL: "https://www.dropbox.com/request/1eig9jhojp76rh774gsh",
 
   // Your waiver PDF. Put it in the repo next to index.html.
   WAIVER_PDF_URL: "waiver.pdf",
@@ -637,9 +637,9 @@ const CONFIG = {
 
   // Where Book/Contact submissions (and portal consent records) go.
   // Easiest: free Formspree form → paste its endpoint, e.g. "https://formspree.io/f/abcdwxyz".
-  FORM_ENDPOINT: "",
+  FORM_ENDPOINT: "https://formsubmit.co/ajax/certified.online1@gmail.com",
   // Fallback if FORM_ENDPOINT is empty: opens the visitor's email app addressed to this.
-  BOOKING_EMAIL: "",
+  BOOKING_EMAIL: "certified.online1@gmail.com",
 
   INSTAGRAM: "https://instagram.com/certifiedonline.us",
 
@@ -651,13 +651,13 @@ const CONFIG = {
   //      e.g. "https://cash.app/$YourTag/{amount}" or "https://paypal.me/yourname/{amount}".
   //      Leave "" and the button sends a booking request instead of opening a payment page.
   PACKAGES: [
-    { id: "basic",     service: "Mix & Master", name: "Basic Mix", price: 35, per: "song", pay: "" },
-    { id: "standard",  service: "Mix & Master", name: "Standard Mix & Master", price: 55, per: "song", popular: true, pay: "" },
-    { id: "certified", service: "Mix & Master", name: "Certified Mix & Production Polish", price: 85, per: "song", pay: "" },
-    { id: "beats",     service: "Beat Sourcing", name: "Beat Sourcing — 2 producers", price: 12, per: "", pay: "" },
-    { id: "ep",        service: "Project Sequencing", seq: "EP", name: "EP Sequencing", price: 12, per: "", pay: "" },
-    { id: "mixtape",   service: "Project Sequencing", seq: "Mixtape", name: "Mixtape Sequencing", price: 15, per: "", pay: "" },
-    { id: "album",     service: "Project Sequencing", seq: "Album", name: "Album Sequencing", price: 25, per: "", pay: "" }
+    { id: "basic",     service: "Mix & Master", name: "Basic Mix", price: 35, per: "song", pay: "https://square.link/u/lO972q6o" },
+    { id: "standard",  service: "Mix & Master", name: "Standard Mix & Master", price: 55, per: "song", popular: true, pay: "https://square.link/u/nT63P7qb" },
+    { id: "certified", service: "Mix & Master", name: "Certified Mix & Production Polish", price: 85, per: "song", pay: "https://square.link/u/9xdD7nUQ" },
+    { id: "beats",     service: "Beat Sourcing", name: "Beat Sourcing — 2 producers", price: 12, per: "", pay: "https://square.link/u/scSaSVJU" },
+    { id: "ep",        service: "Project Sequencing", seq: "EP", name: "EP Sequencing", price: 12, per: "", pay: "https://square.link/u/fEyxzdbm" },
+    { id: "mixtape",   service: "Project Sequencing", seq: "Mixtape", name: "Mixtape Sequencing", price: 15, per: "", pay: "https://square.link/u/G47RwHDa" },
+    { id: "album",     service: "Project Sequencing", seq: "Album", name: "Album Sequencing", price: 25, per: "", pay: "https://square.link/u/3JWXzU47" }
   ],
 
   // ---- MDB Music (video player) ----
@@ -1249,7 +1249,7 @@ function bookUpdate() {
 }
 async function sendForm(data) {
   if (CONFIG.FORM_ENDPOINT) {
-    const r = await fetch(CONFIG.FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(data) });
+    const r = await fetch(CONFIG.FORM_ENDPOINT, { method: "POST", headers: { "Accept": "application/json" }, body: new URLSearchParams(data) });
     if (!r.ok) throw new Error("send failed");
     return "sent";
   }
@@ -1273,9 +1273,9 @@ $("#bookForm").addEventListener("submit", async e => {
   const after = `<br><br><b>Next:</b> upload your files in the <b>Client Portal</b> using the access code on your confirmation.`;
   if (total != null && p.pay) {
     // record the booking, then open checkout right away (keeps pop-up blockers happy)
-    if (CONFIG.FORM_ENDPOINT) { try { fetch(CONFIG.FORM_ENDPOINT, { method: "POST", keepalive: true, headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(data) }); } catch (x) {} }
+    if (CONFIG.FORM_ENDPOINT) { try { fetch(CONFIG.FORM_ENDPOINT, { method: "POST", keepalive: true, headers: { "Accept": "application/json" }, body: new URLSearchParams(data) }); } catch (x) {} }
     window.open(p.pay.replace("{amount}", String(total)), "_blank", "noopener");
-    return msgBox("Checkout opened", `Your payment page for <b>${esc(p.name)}</b> ($${total}) opened in a new tab.${after}`, "💳",
+    return msgBox("Checkout opened", `Your payment page for <b>${esc(p.name)}</b> ($${total}) opened in a new tab.${qty > 1 ? `<br><br><b>Important:</b> on the payment page, set the quantity to <b>${qty}</b> (one per song) so your total is $${total}.` : ""}${after}`, "💳",
       [{ label: "Open Client Portal", red: true, fn: () => openPortal(p.service, p.id) }, { label: "Close" }]);
   }
   const btn = $("#bSend"); btn.disabled = true; btn.textContent = "Sending…";
@@ -1328,7 +1328,7 @@ function markWaiver() { waiverOpened = true; }
     if (!st.ready) return msgBox("Not yet", "Finish every step and check the consent box before sending your files.", "⚠️");
     if (!/^https:\/\/(www\.)?dropbox\.com\//i.test(CONFIG.DROPBOX_REQUEST_URL)) return msgBox("Upload link not set", "The Dropbox upload link isn't connected yet. (Site owner: paste your Dropbox file request link into DROPBOX_REQUEST_URL.)", "⚠️");
     const rec = { _subject: `Portal consent — ${st.artist} / ${st.song}`, form: "Client Portal — waiver accepted", name: st.name, artist: st.artist, email: st.email, song_or_project: st.song, service: st.service, package: st.pkg ? st.pkg.name : "", file_name: st.file, waiver: CONFIG.WAIVER_PDF_URL, consent: "Agreed to the Certified Online LLC Waiver & Acknowledgment and granted file access consent", agreed_at: new Date().toString() };
-    if (CONFIG.FORM_ENDPOINT) { try { fetch(CONFIG.FORM_ENDPOINT, { method: "POST", keepalive: true, headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(rec) }); } catch (e) {} }
+    if (CONFIG.FORM_ENDPOINT) { try { fetch(CONFIG.FORM_ENDPOINT, { method: "POST", keepalive: true, headers: { "Accept": "application/json" }, body: new URLSearchParams(rec) }); } catch (e) {} }
     window.open(CONFIG.DROPBOX_REQUEST_URL, "_blank", "noopener");
     msgBox("Dropbox opened", `Your secure upload page opened in a new tab.<br><br>Name your files like:<br><b>${esc(st.file)}</b>${st.proj ? `<br><br>Send up to <b>${SEQ_TYPES[st.proj].pool} songs</b> for your ${st.proj}${SEQ_TYPES[st.proj].breaks ? ` plus up to ${SEQ_TYPES[st.proj].breaks} sequence breaks` : ""}.` : ""}${st.pkg && st.pkg.service === "Mix & Master" ? "<br><br>Reminder: all uploads are reviewed before I start. If your song needs more repair than your tier covers, I'll reach out with options first." : ""}<br><br>Enter the same name and email on the Dropbox page so I can match it to your session.`, "📤");
   };
