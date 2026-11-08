@@ -293,6 +293,26 @@ input[type=range]{accent-color:var(--red)}
 .dlg{display:flex;gap:12px;align-items:flex-start;padding:14px 12px 6px}
 .dlg .ic{font-size:30px;line-height:1}
 .dlg-btns{display:flex;justify-content:center;gap:8px;padding:8px 0 10px}
+/* ---------- Coming Soon gate ---------- */
+#soon{position:fixed;inset:0;z-index:400000;background:var(--black);color:var(--white);display:none;
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 16px;overflow:auto}
+#soon.on{display:flex}
+#soonWall{position:absolute;inset:-60px;opacity:.12;pointer-events:none;background-repeat:repeat}
+#soon>*:not(#soonWall){position:relative}
+.soon-logo{width:min(250px,58vw);height:auto;margin-bottom:6px;filter:drop-shadow(0 0 18px rgba(255,0,0,.35))}
+.soon-big{font:clamp(46px,11vw,96px)/.85 var(--pix);letter-spacing:4px;margin:6px 0 4px}
+.soon-big b{color:var(--red);font-weight:normal;animation:blink 1.4s steps(2) infinite}
+.soon-tag{font:clamp(18px,3.6vw,24px)/1.1 var(--pix);color:var(--white);opacity:.85;margin-bottom:22px}
+#soon .win{position:relative;display:flex;width:min(360px,100%);text-align:left;color:var(--black)}
+#soon .wbody{max-height:none;padding:12px}
+#soon .row{flex-wrap:nowrap}
+#soonCode{flex:1;width:auto;min-width:0;text-transform:uppercase;letter-spacing:2px}
+#soonErr{min-height:18px;font-size:12px;margin-top:6px}
+.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.soon-ig{margin-top:18px;font:20px var(--pix);color:var(--white);text-decoration:none;border-bottom:1px solid var(--red)}
+.soon-ig:hover{color:var(--red)}
+.soon-foot{margin-top:26px;font:16px var(--pix);color:var(--shade)}
 #boot,#shutdown{position:fixed;inset:0;z-index:300000;background:var(--black);color:var(--white);display:flex;
   flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:var(--pix);cursor:pointer;padding:20px}
 #boot .big,#shutdown .big{font-size:clamp(44px,10vw,92px);line-height:.85;letter-spacing:3px}
@@ -327,6 +347,24 @@ input[type=range]{accent-color:var(--red)}
 </style>
 </head>
 <body>
+
+<!-- ================= COMING SOON ================= -->
+<div id="soon" role="dialog" aria-label="Coming soon">
+  <div id="soonWall" aria-hidden="true"></div>
+  <img class="soon-logo" data-logo alt="Certified Online">
+  <div class="soon-big">COMING<br><b>SOON</b></div>
+  <div class="soon-tag">Fanatic dreams, the faster it seems.</div>
+  <form class="win active" id="soonForm" autocomplete="off" novalidate>
+    <div class="titlebar"><span>🔒</span><span class="ttext">Early Access — CERTIFIED ONLINE</span></div>
+    <div class="wbody">
+      <label class="f" for="soonCode" style="margin-top:0">Have an early access code? Enter it to unlock the site.</label>
+      <div class="row"><input type="password" id="soonCode" placeholder="Access code" autocapitalize="characters" spellcheck="false"><button class="btn red" type="submit">Enter</button></div>
+      <div id="soonErr" class="red-t" aria-live="polite"></div>
+    </div>
+  </form>
+  <a class="soon-ig" data-ig target="_blank" rel="noopener">📷 Follow @certifiedonline.us for the launch</a>
+  <div class="soon-foot">© CERTIFIED ONLINE</div>
+</div>
 
 <!-- ================= BOOT ================= -->
 <div id="boot" role="button" aria-label="Skip intro">
@@ -635,6 +673,12 @@ const CONFIG = {
   // Code you give approved clients to open the portal. "" = no code required.
   PORTAL_CODE: "CERTIFIED",
 
+  // ---- Coming Soon ----
+  // true  = visitors see the Coming Soon screen; the early access code unlocks the site.
+  // false = launch! Everyone goes straight to the site.
+  COMING_SOON: true,
+  EARLY_ACCESS_CODE: "CERTIFIED",
+
   // Where Book/Contact submissions (and portal consent records) go.
   // Easiest: free Formspree form → paste its endpoint, e.g. "https://formspree.io/f/abcdwxyz".
   FORM_ENDPOINT: "https://formsubmit.co/ajax/certified.online1@gmail.com",
@@ -697,6 +741,8 @@ const LOGO_SMALL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAA7CAMAAA
     <image href='${src}' xlink:href='${src}' x='170' y='160' width='140' height='130' transform='rotate(-10 240 225)'/></svg>`;
   $("#wallpaper").style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(tile)}")`;
   $("#wallpaper").style.backgroundSize = "320px 300px";
+  $("#soonWall").style.backgroundImage = $("#wallpaper").style.backgroundImage;
+  $("#soonWall").style.backgroundSize = "320px 300px";
 })();
 
 /* ---------- Dialog ---------- */
@@ -854,7 +900,26 @@ function boot(force) {
   const t = setTimeout(done, 2400);
   b.onclick = () => { clearTimeout(t); done(); };
 }
-boot();
+(function comingSoon() {
+  let unlocked = false; try { unlocked = localStorage.getItem("co_early") === "1"; } catch (e) {}
+  if (!CONFIG.COMING_SOON || unlocked) return boot();
+  const gate = $("#soon"), input = $("#soonCode"), err = $("#soonErr"), form = $("#soonForm");
+  $("#boot").style.display = "none";
+  gate.classList.add("on");
+  setTimeout(() => input.focus(), 100);
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    if (input.value.trim().toUpperCase() === String(CONFIG.EARLY_ACCESS_CODE).toUpperCase()) {
+      try { localStorage.setItem("co_early", "1"); } catch (x) {}
+      gate.classList.remove("on");
+      boot(true);
+    } else {
+      err.textContent = input.value.trim() ? "✖ That code isn't right." : "✖ Enter your access code.";
+      form.classList.remove("shake"); void form.offsetWidth; form.classList.add("shake");
+      input.select();
+    }
+  });
+})();
 
 /* =========================================================
    SERVICE DATA — what clients send for each service
